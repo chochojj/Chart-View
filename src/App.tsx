@@ -1,5 +1,10 @@
+import Chart from './components/Chart';
 function App() {
-  return <>Hello World!</>;
+  return (
+    <>
+      <Chart />
+    </>
+  );
 }
 
 export default App;
