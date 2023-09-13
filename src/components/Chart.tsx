@@ -35,7 +35,7 @@ function App() {
           </button>
         ))}
       </ButtonWrapper>
-      <ResponsiveContainer width="100%" height={700}>
+      <ResponsiveContainer width="100%" height={800}>
         <ComposedChart
           data={processedData}
           margin={{
@@ -86,6 +86,7 @@ export default App;
 const Container = styled.div`
   width: 100%;
   display: flex;
+  padding: 25px 0px;
   flex-direction: column;
   align-items: center;
 `;
@@ -94,6 +95,7 @@ const ButtonWrapper = styled.div`
   width: 500px;
   height: 40px;
   display: flex;
+  margin-bottom: 20px;
   justify-content: space-evenly;
 
   button {
