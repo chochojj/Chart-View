@@ -1,46 +1,97 @@
-# Getting Started with Create React App
+### 시계열 차트 보기
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+데이터를 차트로 시각화합니다
 
-## Available Scripts
+### 데모 영상
 
-In the project directory, you can run:
+| 지역별 차트 보기 | 호버시 그래프 정보 제공 | 그래프 클릭시 지역 활성화 |
+| :--------------: | :---------------------: | :-----------------------: |
+|                  |                         |                           |
 
-### `npm start`
+### 폴더 구조
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+```
+📦src
+ ┣ 📂assets
+ ┃ ┗ 📂data
+ ┃ ┃ ┗ 📜Data.json
+ ┣ 📂components
+ ┃ ┣ 📜Chart.tsx
+ ┃ ┗ 📜CustomTooltip.tsx
+ ┣ 📂hooks
+ ┃ ┗ 📜useChartData.ts
+ ┣ 📂styles
+ ┃ ┗ 📜GlobalStyles.ts
+ ┣ 📂types
+ ┃ ┗ 📜type.ts
+ ┣ 📜App.tsx
+ ┣ 📜index.tsx
+ ┗ 📜react-app-env.d.ts
+```
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+### 기능 설명
 
-### `npm test`
+#### 데이터 시각화
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+rechart 라이브러리를 사용하여 데이터를 차트로 시각화 했습니다
+차트에 사용되는 데이터의 가공은 커스텀 훅으로 분리하여 데이터 처리 방식을 추상화 했습니다
 
-### `npm run build`
+```
+import { useState, useEffect } from 'react';
+import { DataType, DataItem } from '../types/type';
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+function useChartData(data: DataType) {
+  const [processedData, setProcessedData] = useState<DataItem[]>([]);
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+  useEffect(() => {
+    const rawData = data.response;
+    const processedData = Object.keys(rawData).map(key => ({
+      ...rawData[key],
+      name: key.split(' ')[1],
+    }));
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+    setProcessedData(processedData);
+  }, [data]);
 
-### `npm run eject`
+  return { processedData };
+}
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+export default useChartData;
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+```
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+#### 커스텀 툴팁
 
-## Learn More
+커스텀 툴팁을 활용하여 데이터 호버시 해당 값의 정보를 손쉽게 조회할 수 있게 커스텀 했습니다
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```
+import { TooltipProps } from 'recharts';
+...
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+function CustomTooltip({ active, payload }: TooltipProps<number, string>) {
+  if (active && payload && payload.length) {
+    const [bar, area] = payload;
+    return (
+      <Container>
+        <District>{`📍 ${bar.payload.id}`}</District>
+        <Value>
+          <p>
+            {`${bar.dataKey} : `}
+            <span>{`${bar.value}`}</span>
+          </p>
+          <p>
+            {`${area.dataKey} : `}
+            <span>{`${area.value}`}</span>
+          </p>
+        </Value>
+      </Container>
+    );
+  }
+
+  return null;
+}
+
+export default CustomTooltip;
+
+```
