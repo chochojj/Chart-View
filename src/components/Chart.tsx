@@ -13,13 +13,14 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 
+import CustomTooltip from './CustomTooltip';
 import Data from '../assets/data/Data.json';
 import useChartData from '../hooks/useChartData';
 import { DataType } from '../types/type';
 
 function App() {
   const { processedData } = useChartData(Data as DataType);
-  const [district, setDistrict] = useState('');
+  const [district, setDistrict] = useState('전체');
   const districts = ['전체', '강남구', '노원구', '성북구', '중랑구'];
   return (
     <Container>
@@ -48,9 +49,8 @@ function App() {
           <XAxis dataKey="name" scale="band" />
           <YAxis
             yAxisId="area"
-            orientation="left"
             dataKey="value_area"
-            domain={[0, (max: number) => Math.max(max * 2, 200)]}
+            domain={[0, 250]}
             label={{ value: 'Area', angle: -90, position: 'insideLeft' }}
           />
           <YAxis
@@ -58,18 +58,18 @@ function App() {
             orientation="right"
             label={{ value: 'Bar', angle: 90, position: 'insideRight' }}
           />
-          <Tooltip />
+          <Tooltip content={<CustomTooltip />} wrapperStyle={{ outline: 'none' }} />
           <Legend />
           <Bar
             dataKey="value_bar"
-            fill="#8884d8"
+            fill="MediumPurple"
             onClick={data => setDistrict(data.id)}
             barSize={20}
           >
             {processedData.map(data => (
               <Cell
                 key={data.id}
-                fill={data.id === district ? '#5452c3' : '#8884d8'}
+                fill={data.id === district ? 'BlueViolet' : 'MediumPurple'}
                 cursor="pointer"
               />
             ))}
@@ -92,6 +92,7 @@ const Container = styled.div`
 
 const ButtonWrapper = styled.div`
   width: 500px;
+  height: 40px;
   display: flex;
   justify-content: space-evenly;
 
